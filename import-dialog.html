@@ -1,0 +1,22 @@
+// حوار استيراد البيانات
+<div id="import-data-dialog" class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>استيراد البيانات</h3>
+      <button class="close-btn" onclick="hideImportDataDialog()">×</button>
+    </div>
+    <div class="modal-body">
+      <p>سيتم استيراد البيانات التالية من النسخة القديمة:</p>
+      <ul>
+        <li>العملات والأرصدة</li>
+        <li>المعاملات المالية</li>
+        <li>بيانات العملاء والديون</li>
+      </ul>
+      <p class="warning-text">تنبيه: هذه العملية لا يمكن التراجع عنها. هل أنت متأكد من استيراد البيانات؟</p>
+    </div>
+    <div class="modal-footer">
+      <button id="cancel-import-btn" class="cancel-btn">إلغاء</button>
+      <button id="confirm-import-btn" class="confirm-btn">تأكيد الاستيراد</button>
+    </div>
+  </div>
+</div>

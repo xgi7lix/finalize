@@ -1,0 +1,66 @@
+// صفحة الملف الشخصي
+<div class="container page" id="profile-page">
+  <div class="page-header">
+    <i class="fas fa-user"></i>
+    <h2>الملف الشخصي</h2>
+  </div>
+  
+  <div class="profile-container">
+    <div class="profile-header">
+      <img id="profile-avatar" src="" alt="صورة المستخدم" class="profile-avatar">
+      <div class="profile-info">
+        <h3 id="profile-name"></h3>
+        <p id="profile-email"></p>
+      </div>
+    </div>
+    
+    <div class="profile-details">
+      <div class="profile-detail-item">
+        <span class="detail-label">تاريخ الانضمام:</span>
+        <span id="profile-join-date" class="detail-value"></span>
+      </div>
+      <div class="profile-detail-item">
+        <span class="detail-label">آخر تسجيل دخول:</span>
+        <span id="profile-last-login" class="detail-value"></span>
+      </div>
+    </div>
+    
+    <div class="settings-card">
+      <h3>إعدادات السمة</h3>
+      <div class="settings-buttons">
+        <button id="light-theme-btn" class="theme-btn active">
+          <i class="fas fa-sun"></i> الوضع الفاتح
+        </button>
+        <button id="dark-theme-btn" class="theme-btn">
+          <i class="fas fa-moon"></i> الوضع المظلم
+        </button>
+      </div>
+      <button id="save-theme-btn" class="save-settings-btn">
+        <i class="fas fa-save"></i> حفظ إعدادات السمة
+      </button>
+    </div>
+    
+    <div class="settings-card">
+      <h3>إعدادات اللغة</h3>
+      <div class="settings-buttons">
+        <button id="ar-lang-btn" class="lang-btn active">
+          <i class="fas fa-language"></i> العربية
+        </button>
+        <button id="en-lang-btn" class="lang-btn">
+          <i class="fas fa-language"></i> الإنجليزية
+        </button>
+      </div>
+      <button id="save-language-btn" class="save-settings-btn">
+        <i class="fas fa-save"></i> حفظ إعدادات اللغة
+      </button>
+    </div>
+    
+    <div class="settings-card">
+      <h3>استيراد البيانات</h3>
+      <p>يمكنك استيراد بياناتك من النسخة القديمة من التطبيق.</p>
+      <button id="import-data-btn" class="import-btn">
+        <i class="fas fa-file-import"></i> استيراد البيانات
+      </button>
+    </div>
+  </div>
+</div>

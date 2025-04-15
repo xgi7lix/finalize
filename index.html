@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2C786C">
+  <meta name="description" content="نظام الإدارة المالية المتقدم - إدارة أموالك بسهولة وأمان">
+  <title>نظام الإدارة المالية المتقدم</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* تحميل الأنماط الأساسية مباشرة لتحسين الأداء */
+    body {
+      font-family: 'Tajawal', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    #loading-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid var(--primary-color);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    #notification-container {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 9998;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .notification {
+      padding: 12px 20px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
+      transition: opacity 0.3s ease;
+    }
+    
+    .notification i {
+      margin-left: 10px;
+    }
+    
+    .notification.success {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    .notification.error {
+      background-color: #F44336;
+      color: white;
+    }
+    
+    .notification.warning {
+      background-color: #FF9800;
+      color: white;
+    }
+    
+    .notification.info {
+      background-color: #2196F3;
+      color: white;
+    }
+    
+    #online-status {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9997;
+    }
+    
+    #online-status.online {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    #online-status.offline {
+      background-color: #F44336;
+      color: white;
+    }
+    
+    #pending-operations-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #FF9800;
+      color: white;
+      font-size: 12px;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- مؤشر التحميل -->
+  <div id="loading-indicator">
+    <div class="spinner"></div>
+  </div>
+  
+  <!-- حاوية الإشعارات -->
+  <div id="notification-container"></div>
+  
+  <!-- مؤشر حالة الاتصال -->
+  <div id="online-status" class="online">
+    <i class="fas fa-wifi"></i>
+    <div id="pending-operations-badge">0</div>
+  </div>
+  
+  <!-- حاوية تسجيل الدخول -->
+  <div id="login-container" style="display: flex;">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>نظام الإدارة المالية المتقدم</h1>
+        <p>قم بتسجيل الدخول للوصول إلى حسابك</p>
+      </div>
+      <div class="login-body">
+        <button id="google-login-btn" class="google-btn">
+          <i class="fab fa-google"></i> تسجيل الدخول باستخدام Google
+        </button>
+        <div id="login-error" class="error-message"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- الهيدر الرئيسي -->
+  <header id="main-header" style="display: none;">
+    <div class="header-content">
+      <button id="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h1>نظام الإدارة المالية المتقدم</h1>
+      <div class="user-info">
+        <img id="user-avatar" src="" alt="صورة المستخدم">
+        <span id="user-name"></span>
+      </div>
+    </div>
+  </header>
+  
+  <!-- هيدر الصفحة -->
+  <div id="page-header" style="display: none;">
+    <h2 id="page-title"></h2>
+    <button class="back-btn" onclick="showPage('dashboard-page')">
+      <i class="fas fa-arrow-right"></i> العودة
+    </button>
+  </div>
+  
+  <!-- القائمة الجانبية -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <img id="sidebar-user-avatar" src="" alt="صورة المستخدم">
+      <div class="sidebar-user-info">
+        <h3 id="sidebar-user-name"></h3>
+        <p id="sidebar-user-email"></p>
+      </div>
+    </div>
+    <div class="sidebar-menu">
+      <button onclick="showPage('dashboard-page')">
+        <i class="fas fa-home"></i> الرئيسية
+      </button>
+      <button onclick="showPage('transactions-page')">
+        <i class="fas fa-exchange-alt"></i> المعاملات
+      </button>
+      <button onclick="showPage('balances-page')">
+        <i class="fas fa-wallet"></i> الأرصدة
+      </button>
+      <button onclick="showPage('clients-page')">
+        <i class="fas fa-users"></i> العملاء
+      </button>
+      <button onclick="showPage('profile-page')">
+        <i class="fas fa-user"></i> الملف الشخصي
+      </button>
+      <button id="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+      </button>
+    </div>
+  </div>
+  
+  <!-- المحتوى الرئيسي -->
+  <div id="main-content" style="display: none;">
+    <!-- صفحة لوحة التحكم -->
+    <div class="container page" id="dashboard-page">
+      <div class="page-header">
+        <i class="fas fa-home"></i>
+        <h2>لوحة التحكم</h2>
+      </div>
+      
+      <div class="dashboard-cards">
+        <div class="dashboard-card">
+          <div class="card-icon">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <div class="card-content">
+            <h3>الرصيد الكلي</h3>
+            <p id="total-balance">0</p>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+          <div class="card-content">
+            <h3>إجمالي الوارد</h3>
+            <p id="total-income">0 SDG</p>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+          <div class="card-content">
+            <h3>إجمالي الصادر</h3>
+            <p id="total-expenses">0 SDG</p>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <div class="card-content">
+            <h3>إجمالي الديون</h3>
+            <p id="total-debts">0 SDG</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dashboard-section">
+        <h3>آخر المعاملات</h3>
+        <div id="dashboard-recent-transactions" class="recent-transactions"></div>
+      </div>
+    </div>
+    
+    <!-- صفحة المعاملات -->
+    <div class="container page" id="transactions-page">
+      <div class="page-header">
+        <i class="fas fa-exchange-alt"></i>
+        <h2>المعاملات</h2>
+      </div>
+      
+      <div class="transactions-container">
+        <div class="transactions-actions">
+          <button class="action-btn" onclick="showPage('add-transaction-page')">
+            <i class="fas fa-plus"></i> إضافة معاملة
+          </button>
+          <button class="action-btn" onclick="showPage('add-transfer-page')">
+            <i class="fas fa-exchange-alt"></i> إضافة تحويل
+          </button>
+        </div>
+        
+        <div id="transactionsList" class="transactions-list"></div>
+      </div>
+    </div>
+    
+    <!-- صفحة الأرصدة -->
+    <div class="container page" id="balances-page">
+      <div class="page-header">
+        <i class="fas fa-wallet"></i>
+        <h2>الأرصدة</h2>
+      </div>
+      
+      <div class="balances-container">
+        <div class="balances-actions">
+          <button class="action-btn" onclick="showPage('add-currency-page')">
+            <i class="fas fa-plus"></i> إضافة عملة
+          </button>
+          <button class="action-btn" onclick="showPage('update-balance-page')">
+            <i class="fas fa-edit"></i> تعديل رصيد
+          </button>
+        </div>
+        
+        <div id="balancesList" class="balances-list"></div>
+      </div>
+    </div>
+    
+    <!-- صفحة العملاء -->
+    <div class="container page" id="clients-page">
+      <div class="page-header">
+        <i class="fas fa-users"></i>
+        <h2>العملاء</h2>
+      </div>
+      
+      <div class="clients-container">
+        <div class="clients-actions">
+          <button class="action-btn" onclick="showPage('add-client-page')">
+            <i class="fas fa-plus"></i> إضافة عميل
+          </button>
+          <button class="action-btn" onclick="showPage('remove-client-page')">
+            <i class="fas fa-trash"></i> حذف عميل
+          </button>
+        </div>
+        
+        <div id="clientsListDisplay" class="clients-list"></div>
+        
+        <div class="debt-summary">
+          <p id="overallDebtSummary">لا توجد ديون مسجلة</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- صفحة تفاصيل الديون -->
+    <div class="container page" id="debtDetailsPage">
+      <div class="page-header">
+        <i class="fas fa-handshake"></i>
+        <h2>تفاصيل ديون <span id="clientDetailsName"></span></h2>
+      </div>
+      
+      <div class="debt-details-container">
+        <div class="debt-actions">
+          <button class="action-btn" onclick="showAddDebtDialog('له')">
+            <i class="fas fa-plus"></i> إضافة دين له
+          </button>
+          <button class="action-btn" onclick="showAddDebtDialog('لك')">
+            <i class="fas fa-plus"></i> إضافة دين لك
+          </button>
+        </div>
+        
+        <div class="debt-summary">
+          <p id="clientDebtSummary">لا توجد ديون مسجلة</p>
+        </div>
+        
+        <div id="clientDebtDetails" class="debt-details"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- حوار استيراد البيانات -->
+  <div id="import-data-dialog" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>استيراد البيانات</h3>
+        <button class="close-btn" onclick="hideImportDataDialog()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>سيتم استيراد البيانات التالية من النسخة القديمة:</p>
+        <ul>
+          <li>العملات والأرصدة</li>
+          <li>المعاملات المالية</li>
+          <li>بيانات العملاء والديون</li>
+        </ul>
+        <p class="warning-text">تنبيه: هذه العملية لا يمكن التراجع عنها. هل أنت متأكد من استيراد البيانات؟</p>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-import-btn" class="cancel-btn">إلغاء</button>
+        <button id="confirm-import-btn" class="confirm-btn">تأكيد الاستيراد</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- تضمين ملف JavaScript الرئيسي -->
+  <script src="bundle.js"></script>
+</body>
+</html>
